@@ -5,10 +5,10 @@
 
 Usage:
     scdl -l <track_url> [-a | -f | -t | -p][-c][-o <offset>]\
-[--hidewarnings][--debug | --error][--path <path>][--addtofile][--onlymp3]
+[--hidewarnings][--debug | --error][--path <path>][--addtofile][--addtopath][--onlymp3]
 [--hide-progress][--min-size <size>][--max-size <size>]
     scdl me (-s | -a | -f | -t | -p | -m)[-c][-o <offset>]\
-[--hidewarnings][--debug | --error][--path <path>][--addtofile][--onlymp3]
+[--hidewarnings][--debug | --error][--path <path>][--addtofile][--addtopath][--onlymp3]
 [--hide-progress][--min-size <size>][--max-size <size>]
     scdl -h | --help
     scdl --version
@@ -32,6 +32,7 @@ Options:
     --max-size [max-size] Skip tracks larger than size (k/m/g)
     --hidewarnings        Hide Warnings. (use with precaution)
     --addtofile           Add the artist name to the filename if it isn't in the filename already
+    --addtopath        Prepend the artist name to the path
     --onlymp3             Download only the mp3 file even if the track is Downloadable
     --error               Only print debug information (Error/Warning)
     --debug               Print every information and
@@ -314,10 +315,15 @@ def download_playlist(playlist):
     """
     Download a playlist
     """
+    global arguments
+    
     invalid_chars = '\/:*?|<>"'
     playlist_name = playlist['title'].encode('utf-8', 'ignore')
     playlist_name = playlist_name.decode('utf8')
     playlist_name = ''.join(c for c in playlist_name if c not in invalid_chars)
+    
+    if arguments['--addtopath']:
+        playlist_name = '{0} - {1}'.format(playlist.user['username'], playlist_name)
 
     if not os.path.exists(playlist_name):
         os.makedirs(playlist_name)
